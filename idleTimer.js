@@ -6,6 +6,10 @@
 //    idleTimeAlllowded: amount of time in milliseconds that can pass before someone is deemed idle; default = 20 min.
 //    onTimeExceeded: callback run when allowed idle-time is exceeded; default = console.log message.
 //    onNewActivity: callback run after a user has been idle and new activity is detected; default = console.log message.
+//
+//  Dependencies:
+//    underscore/lodash's bindAll Method
+//    jQuery
 (function() {
 
   idleTimer = function(options) {
@@ -20,8 +24,10 @@
 
         this.timeSpentIdle = 0; //in milliseconds
         this.state = "tracking_idleness";
-        this.interval = options.interval || 1000*60; //in milliseconds; default is 1 min.
-        this.maxIdleTime = options.maxIdleTime || 1000*60*20; //in milliseconds; default is 20 mins.
+        //in milliseconds; default is 1 min:
+        this.interval = options.interval            || 60*1000; 
+        //in milliseconds; default is 20 min:
+        this.maxIdleTime = options.maxIdleTime || 20*60*1000;
         this.onTimeExceeded = options.onTimeExceeded || function() { 
           console.log(  "idleTimer: You have been idle for more than " + 
                         (Math.floor((this.maxIdleTime / 1000 / 60)))+" minutes" )
@@ -38,12 +44,13 @@
 
         this.timeSpentIdle = this.timeSpentIdle + this.interval; 
      
+        console.log("incrementTimer (interval, timeSpentIdle, maxIdleTime): ", this.interval,  this.timeSpentIdle, this.maxIdleTime );
         // If user has exceeded max amount of time, then call fn
         if (this.timeSpentIdle >= this.maxIdleTime) { 
           this.timeSpentIdle = 0;
-          clearInterval(this.intervalId);
           this.state = "watching_for_new_activity";
           this.onTimeExceeded();
+          clearInterval(this.intervalId);
         };
 
       },

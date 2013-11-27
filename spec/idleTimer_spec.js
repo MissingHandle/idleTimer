@@ -58,20 +58,20 @@ describe('idleTimer instance', function() {
   });  
 
   it('.incrementTimer() should always increase the amount of time spent idle by the interval between checks.', function() {
-    timer.timeSpentIdle = 0;
+    timer.timeSpentIdle = 1;
     timer.incrementTimer();
-    expect(timer.timeSpentIdle).toBe(timer.interval);
+    expect(timer.timeSpentIdle).toBe((1+timer.interval));
   });
 
   it("when calling .incrementTimer() increases the timeSpentIdle past the maxIdleTime, it should change the timer's state to 'watching_for_new_activity'.", function() {
-    timer.state = "not_watching_for_new_activity";
-    timer.timeSpentIdle = this.maxIdleTime - 1;
+    timer.timeSpentIdle = timer.maxIdleTime - 1;
+    timer.state = "not_set";
     timer.incrementTimer();
     expect(timer.state).toBe("watching_for_new_activity");
   });
 
   it("when calling .incrementTimer() increases timeSpentIdle past maxIdleTime, it should change call timer.onTimeExceeded", function() {
-    timer.timeSpentIdle = this.maxIdleTime - 1;
+    timer.timeSpentIdle = timer.maxIdleTime - 1;
     spyOn(timer, 'onTimeExceeded');
     timer.incrementTimer();
     expect(timer.onTimeExceeded).toHaveBeenCalled();
@@ -103,11 +103,20 @@ describe('idleTimer instance', function() {
     spyOn(timer, "onNewActivity");
     timer.state = "watching_for_new_activity";
     timer.noteActivity();
-    expect(timer.noteActivity).toHaveBeenCalled();
+    expect(timer.onNewActivity).toHaveBeenCalled();
   });
 
-  it('instances should have a start method', function() {
+  it('should have a start method', function() {
     expect(timer.start).toBeAFunction();
+  });
+
+  it("After calling timer.start(), every mousemove or keypress should result in noted activity", function() {
+      spyOn(timer, 'noteActivity');
+      timer.start();    
+      $('body').trigger('mousemove');
+      expect(timer.noteActivity.mostRecentCall.args[0].type).toBe('mousemove');
+      $('body').trigger('keypress');
+      expect(timer.noteActivity.mostRecentCall.args[0].type).toBe('keypress');
   });
 
 });
