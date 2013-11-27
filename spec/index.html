@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>Require.js with Jasmine Example</title>
+      <link rel="stylesheet" href="jasmine.css">
+      <script src="jasmine.js"></script>
+      <script src="/testem.js"></script>
+      <script src="jasmine-html.js"></script>
+      <script src="lodash.js"></script>
+      <script src="../idleTimer.js"></script>
+      <script src="idleTimer_spec.js"></script>
+    </head>
+    <body>
+        <h1>tee.js tests</h1>
+    </body>
+    <script>
+      var reporter = new jasmine.TrivialReporter
+        , env = jasmine.getEnv()
+      env.specFilter = function(spec){
+              return reporter.specFilter(spec)
+      }
+      env.addReporter(reporter)
+      env.execute()
+    </script>    
+</html>
